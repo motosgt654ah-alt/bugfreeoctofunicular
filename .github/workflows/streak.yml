@@ -1,0 +1,31 @@
+name: Executar Contador de Streak
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  run-tracker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixar código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Rodar o script do contador
+      run: python contador.py
+
+    - name: Salvar alterações no repositório
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add dados_sequencia.txt || true
+        git commit -m "Atualizando streak automaticamente [skip ci]" || true
+        git push || true
+        
