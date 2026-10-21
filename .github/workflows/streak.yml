@@ -18,14 +18,5 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Instalar dependências do sistema e Kivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb libgl1-mesa-dev libgles2-mesa-dev
-          python -m pip install --upgrade pip
-          pip install kivy
-
       - name: Rodar o script do contador
-        run: |
-          xvfb-run python contador.py
-          
+        run: python contador.py
