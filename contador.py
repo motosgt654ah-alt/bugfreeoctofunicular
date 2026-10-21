@@ -1,35 +1,59 @@
-from datetime import datetime, timedelta
+import calendar
+from datetime import datetime
 
-def atualizar_sequencia():
-    hoje = datetime.now().date()
-    arquivo_dados = "dados_sequencia.txt"
+# Lista de feriados nacionais fixos (DD/MM)
+FERIADOS = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "25/12"]
+
+def obter_cor_do_dia(ano, mes, dia, fez_commit):
+    """
+    Define a cor do quadradinho de acordo com as regras:
+    - Feriado: Amarelo/Dourado (#FFD700)
+    - Mês Atual com commit: Verde Neon (#00FF66)
+    - Mês Passado com commit: Verde Claro (#7CE38B)
+    - Sem commit (Inatividade): Vermelho (#FF3344)
+    """
+    data_atual = datetime.now()
+    data_dia = datetime(ano, mes, dia)
+    data_str = data_dia.strftime("%d/%m")
     
-    try:
-        # Tenta ler o arquivo de dados anterior
-        with open(arquivo_dados, "r") as f:
-            linha = f.read().strip()
-            data_str, dias_str = linha.split(",")
-            ultima_data = datetime.strptime(data_str, "%Y-%m-%d").date()
-            dias = int(dias_str)
-    except FileNotFoundError:
-        # Primeira vez criando o arquivo: inicia com os seus 5 dias
-        dias = 5
-        ultima_data = hoje - timedelta(days=1)
+    # 1. Verifica se é feriado
+    if data_str in FERIADOS:
+        return "#FFD700"
+        
+    # 2. Verifica se houve commits/trabalho
+    if fez_commit:
+        # Se for o mês e ano atuais, usa Verde Neon; senão, Verde Claro
+        if ano == data_atual.year and mes == data_atual.month:
+            return "#00FF66"
+        else:
+            return "#7CE38B"
+            
+    # 3. Dias sem trabalho (inatividade)
+    return "#FF3344"
 
-    if hoje == ultima_data:
-        print(f"Presença de hoje já registrada! Você continua no {dias}º dia.")
-    elif hoje == ultima_data + timedelta(days=1):
-        dias += 1
-        print(f"Sequência mantida! Agora você está no {dias}º dia seguido!")
-        with open(arquivo_dados, "w") as f:
-            f.write(f"{hoje},{dias}")
-    else:
-        # Se passou mais de um dia sem atualizar, reinicia
-        dias = 1
-        print("Nova sequência iniciada no 1º dia!")
-        with open(arquivo_dados, "w") as f:
-            f.write(f"{hoje},{dias}")
-
-if __name__ == "__main__":
-    atualizar_sequencia()
-  
+def gerar_grade_anual(ano_desejado=None):
+    """
+    Gera a matriz de dias respeitando a quantidade real de dias de cada mês
+    e a virada automática do ano atual se nenhum ano for informado.
+    """
+    if ano_desejado is None:
+        ano_desejado = datetime.now().year
+        
+    calendario_ano = {}
+    
+    for mes in range(1, 13):
+        # calendar.monthrange retorna (dia_da_semana_inicio, total_de_dias_no_mes)
+        _, total_dias = calendar.monthrange(ano_desejado, mes)
+        
+        dias_mes = []
+        for dia in range(1, total_dias + 1):
+            # Aqui você conecta com a checagem real dos seus commits do GitHub
+            fez_commit = False  # Exemplo padrão, substitua pela sua verificação de commits
+            
+            cor = obter_cor_do_dia(ano_desejado, mes, dia, fez_commit)
+            dias_mes.append({"dia": dia, "cor": cor})
+            
+        calendario_ano[mes] = dias_mes
+        
+    return calendario_ano
+    
