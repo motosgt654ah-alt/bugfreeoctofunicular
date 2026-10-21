@@ -19,13 +19,7 @@ jobs:
         python-version: '3.x'
 
     - name: Rodar o script do contador
-      run: python contador.py
-
-    - name: Salvar alterações no repositório
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add dados_sequencia.txt || true
-        git commit -m "Atualizando streak automaticamente [skip ci]" || true
-        git push || true
+        pip install kivy
+        python contador.py
         
