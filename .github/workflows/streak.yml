@@ -18,6 +18,12 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Instalar dependências e Kivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          pip install kivy
+
       - name: Rodar o script do contador
-        run: python contador.py
-        
+        run: |
+          xvfb-run python contador.py
